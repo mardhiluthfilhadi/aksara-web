@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>mardhi</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: system-ui, sans-serif;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 20px;
+      background: #fff;
+      color: #111;
+    }
+
+    .wrap { width: 100%; max-width: 480px; }
+
+    .row {
+      display: flex;
+      gap: 8px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 11px 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: monospace;
+      background: #fafafa;
+      color: #111;
+      outline: none;
+      min-width: 0;
+    }
+
+    .copy-btn {
+      padding: 11px 14px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: monospace;
+      background: #fafafa;
+      color: #111;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .copy-btn:active { opacity: 0.7; }
+
+    .invalid {
+      text-align: center;
+      font-size: 18px;
+      color: #555;
+    }
+
+    .invalid span { display: block; font-size: 40px; margin-bottom: 12px; }
+  </style>
+</head>
+<body>
+  <div class="wrap" id="app"></div>
+
+  <script>
+    const VALID_HASH = 'password kamu adalah rasa cintamu yang mendalam';
+    const SECRET_CONTENT = `Ini konten rahasiamu — ganti teks ini sesuai kebutuhan.`;
+
+    async function sha256(msg) {
+      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg));
+      return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    async function copyText() {
+      const input = document.getElementById('inp');
+      const btn = document.getElementById('btn');
+      await navigator.clipboard.writeText(input.value).catch(() => { input.select(); document.execCommand('copy'); });
+      btn.textContent = '✅';
+      setTimeout(() => btn.textContent = '📋', 2000);
+    }
+
+    (async () => {
+      const source = new URLSearchParams(window.location.search).get('source');
+      const app = document.getElementById('app');
+
+      if (source && source === await sha256(VALID_HASH)) {
+        app.innerHTML = `
+          <div class="row">
+            <input id="inp" type="text" value="${SECRET_CONTENT}" readonly />
+            <button class="copy-btn" id="btn" onclick="copyText()">📋</button>
+          </div>`;
+      } else {
+        app.innerHTML = `<div class="invalid"><span>🎲</span>Anda belum beruntung</div>`;
+      }
+    })();
+  </script>
+</body>
+</html>
