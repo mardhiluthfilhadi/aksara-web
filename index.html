@@ -88,6 +88,7 @@
       if (source && source === await sha256(VALID_HASH)) {
         app.innerHTML = `
           <div class="row">
+            <p>Copy-Paste teks ini di app Belajar Aksara</p>
             <input id="inp" type="text" value="${SECRET_CONTENT}" readonly />
             <button class="copy-btn" id="btn" onclick="copyText()">📋</button>
           </div>`;
